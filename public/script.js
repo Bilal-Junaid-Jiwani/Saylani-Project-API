@@ -1,5 +1,5 @@
 // ✅ Use relative path so it works on Render
-const API_URL = "/api/products";
+const API_URL = "https://saylani-project-api.onrender.com/api/products";
 
 async function getProducts() {
   const res = await fetch(API_URL);
