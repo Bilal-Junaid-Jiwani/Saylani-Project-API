@@ -1,50 +1,64 @@
-import express from "express";
-import cors from "cors";
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Middlewares
+// Middleware
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-// Sample Data
-let products = [
-  { id: 1, name: "Product 1", price: 100 },
-  { id: 2, name: "Product 2", price: 200 }
-];
+// MongoDB Connection
+mongoose
+  .connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/saylani_api", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+
+// Schema & Model
+const ItemSchema = new mongoose.Schema({
+  name: String,
+  price: Number,
+});
+const Item = mongoose.model("Item", ItemSchema);
 
 // Routes
-app.get("/api/products", (req, res) => {
-  res.json(products);
+app.get("/", (req, res) => {
+  res.send("Welcome to Saylani API 🚀");
 });
 
-app.post("/api/products", (req, res) => {
-  const newProduct = {
-    id: products.length + 1,
-    name: req.body.name,
-    price: req.body.price
-  };
-  products.push(newProduct);
-  res.status(201).json(newProduct);
+// Get all items
+app.get("/api/items", async (req, res) => {
+  const items = await Item.find();
+  res.json(items);
 });
 
-app.put("/api/products/:id", (req, res) => {
-  const product = products.find(p => p.id == req.params.id);
-  if (!product) {
-    return res.status(404).json({ message: "Product not found" });
-  }
-  product.name = req.body.name;
-  product.price = req.body.price;
-  res.json(product);
+// Create item
+app.post("/api/items", async (req, res) => {
+  const newItem = new Item(req.body);
+  await newItem.save();
+  res.status(201).json(newItem);
 });
 
-app.delete("/api/products/:id", (req, res) => {
-  products = products.filter(p => p.id != req.params.id);
-  res.json({ message: "Product deleted" });
+// Update item
+app.put("/api/items/:id", async (req, res) => {
+  const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  res.json(updatedItem);
 });
 
-// ✅ Use Render's port
-const PORT = process.env.PORT || 3000;
+// Delete item
+app.delete("/api/items/:id", async (req, res) => {
+  await Item.findByIdAndDelete(req.params.id);
+  res.json({ message: "Item deleted" });
+});
+
+// Start Server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
