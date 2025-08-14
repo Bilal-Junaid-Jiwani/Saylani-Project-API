@@ -1,53 +1,50 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const path = require("path");
+import express from "express";
+import cors from "cors";
 
 const app = express();
+
+// Middlewares
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json());
 
-let products = [];
-let idCounter = 1;
+// Sample Data
+let products = [
+  { id: 1, name: "Product 1", price: 100 },
+  { id: 2, name: "Product 2", price: 200 }
+];
 
-// Create Product
-app.post("/api/products", (req, res) => {
-    const { name, price } = req.body;
-    if (!name || !price) {
-        return res.status(400).json({ message: "Name and price are required" });
-    }
-    const newProduct = { id: idCounter++, name, price };
-    products.push(newProduct);
-    res.status(201).json(newProduct);
-});
-
-// Get All Products
+// Routes
 app.get("/api/products", (req, res) => {
-    res.json(products);
+  res.json(products);
 });
 
-// Update Product
+app.post("/api/products", (req, res) => {
+  const newProduct = {
+    id: products.length + 1,
+    name: req.body.name,
+    price: req.body.price
+  };
+  products.push(newProduct);
+  res.status(201).json(newProduct);
+});
+
 app.put("/api/products/:id", (req, res) => {
-    const { id } = req.params;
-    const { name, price } = req.body;
-    const product = products.find(p => p.id == id);
-    if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-    }
-    product.name = name || product.name;
-    product.price = price || product.price;
-    res.json(product);
+  const product = products.find(p => p.id == req.params.id);
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+  product.name = req.body.name;
+  product.price = req.body.price;
+  res.json(product);
 });
 
-// Delete Product
 app.delete("/api/products/:id", (req, res) => {
-    const { id } = req.params;
-    products = products.filter(p => p.id != id);
-    res.json({ message: "Product deleted successfully" });
+  products = products.filter(p => p.id != req.params.id);
+  res.json({ message: "Product deleted" });
 });
 
-const PORT = 3000;
+// ✅ Use Render's port
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
