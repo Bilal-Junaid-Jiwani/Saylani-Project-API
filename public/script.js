@@ -1,4 +1,3 @@
-// ✅ Update this to your Render deployed URL
 const API_URL = "https://saylani-project-api.onrender.com/api/products";
 
 const form = document.getElementById("productForm");
@@ -38,7 +37,6 @@ form.addEventListener("submit", async (e) => {
     }
 
     if (editId) {
-        // Update product
         await fetch(`${API_URL}/${editId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -47,7 +45,6 @@ form.addEventListener("submit", async (e) => {
         editId = null;
         form.querySelector("button").textContent = "Save Product";
     } else {
-        // Add product
         await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },

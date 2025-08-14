@@ -1,14 +1,20 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
-    width: 600px;
+    max-width: 800px;
     margin: 50px auto;
     background: white;
     padding: 20px;
-    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
 }
 
 form {
@@ -17,8 +23,9 @@ form {
     margin-bottom: 20px;
 }
 
-input, button {
-    padding: 8px;
+form input, form button {
+    padding: 10px;
+    font-size: 16px;
 }
 
 table {
@@ -26,22 +33,29 @@ table {
     border-collapse: collapse;
 }
 
-th, td {
-    padding: 10px;
+table, th, td {
     border: 1px solid #ddd;
 }
 
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
 button {
-    background: #28a745;
-    color: white;
-    border: none;
     cursor: pointer;
 }
 
-button.edit {
-    background: #007bff;
+.edit {
+    background-color: orange;
+    color: white;
+    border: none;
+    padding: 5px 10px;
 }
 
-button.delete {
-    background: #dc3545;
+.delete {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
 }

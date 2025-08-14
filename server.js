@@ -3,7 +3,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,19 +10,22 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ MongoDB Connection Error:", err));
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// Mongoose Schema & Model
+// Schema & Model
 const ItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
-}, { timestamps: true });
-
+});
 const Item = mongoose.model("Item", ItemSchema);
 
 // Routes
@@ -31,32 +33,29 @@ app.get("/", (req, res) => {
   res.send("Welcome to Saylani API 🚀");
 });
 
-// Get all items
-app.get("/api/items", async (req, res) => {
+// CRUD Endpoints
+app.get("/api/products", async (req, res) => {
   const items = await Item.find();
   res.json(items);
 });
 
-// Create item
-app.post("/api/items", async (req, res) => {
+app.post("/api/products", async (req, res) => {
   const newItem = new Item(req.body);
   await newItem.save();
   res.status(201).json(newItem);
 });
 
-// Update item
-app.put("/api/items/:id", async (req, res) => {
+app.put("/api/products/:id", async (req, res) => {
   const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json(updatedItem);
 });
 
-// Delete item
-app.delete("/api/items/:id", async (req, res) => {
+app.delete("/api/products/:id", async (req, res) => {
   await Item.findByIdAndDelete(req.params.id);
   res.json({ message: "Item deleted" });
 });
 
-// Start Server
+// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
